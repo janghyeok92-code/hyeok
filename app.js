@@ -10,12 +10,12 @@ const items = [
  {topic:'진행상',q:'동작이 진행 중임을 뚜렷하게 나타내는 문장은?',s:'시제는 사건의 시간, 동작상은 동작이 펼쳐지는 모습을 보여 줍니다.',o:['수아가 책을 다 읽었다.','수아가 책을 읽을 것이다.','수아가 책을 읽고 있다.','수아가 책을 읽으려고 한다.'],a:2,h:'이미 끝났거나 계획한 것이 아니라, 동작이 이어지는 모습을 찾아보세요.'},
  {topic:'완료상',q:'이 문장의 ‘-어 있다’가 나타내는 의미는?',s:'문이 열려 있다.',o:['문을 여는 동작이 막 시작된다.','앞으로 문을 열 예정이다.','누군가 계속 문을 열고 닫는다.','문이 열린 결과 상태가 이어진다.'],a:3,h:'문을 여는 순간과, 열린 뒤 유지되는 상태를 구별해 보세요.'}
 ];
-const key='malgyeol-progress-v1';
+let key=null, studentId=null;
 let saved={best:0,answers:[]}, storageOK=true;
-try{const v=JSON.parse(localStorage.getItem(key));if(v && Number.isFinite(v.best)) saved={best:Math.max(0,Math.min(100,v.best)),answers:Array.isArray(v.answers)?v.answers:[]};}catch(e){storageOK=false;}
+
 let answers=items.map((q,i)=>Number.isInteger(saved.answers[i])&&saved.answers[i]>=0&&saved.answers[i]<4?saved.answers[i]:null);
 const $=id=>document.getElementById(id);
-function persist(){try{localStorage.setItem(key,JSON.stringify({best:saved.best,answers}));}catch(e){storageOK=false;}status();}
+function persist(){if(!key)return;try{localStorage.setItem(key,JSON.stringify({best:saved.best,answers}));}catch(e){storageOK=false;}status();}
 function status(){ $('record').textContent=(saved.best?'최고 점수 '+saved.best+'점':'첫 도전을 기다리고 있어요.')+(storageOK?'':' · 저장 불가: 이 창에서만 유지');$('mastery').style.width=saved.best+'%';$('lock').textContent=saved.best>=90?'열림':'잠김';$('progress').textContent=answers.filter(x=>x!==null).length+' / 10문항 응답';}
 $('questions').innerHTML=items.map((q,i)=>`<article class="question"><div class="qtop"><span>QUESTION ${String(i+1).padStart(2,'0')}</span><span>${q.topic}</span></div><h3 id="q${i}">${q.q}</h3><p class="sentence">${q.s}</p><div role="group" aria-labelledby="q${i}">${q.o.map((o,j)=>`<label class="option"><input type="radio" name="q${i}" value="${j}" ${answers[i]===j?'checked':''}><span>${o}</span></label>`).join('')}</div><details><summary>생각을 여는 힌트</summary><p>${q.h}</p></details></article>`).join('');
 $('questions').addEventListener('change',e=>{if(e.target.matches('input')){answers[Number(e.target.name.slice(1))]=Number(e.target.value);$('result').hidden=true;persist();}});
@@ -31,3 +31,16 @@ function validBackup(v){return v&&v.app==='malgyeol'&&v.version===1&&Number.isIn
 $('export').onclick=()=>{const data={app:'malgyeol',version:1,best:saved.best,answers};const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='말의결-학습기록.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('backupStatus').textContent='백업 파일 다운로드를 요청했습니다. 다운로드 폴더에서 파일을 확인하세요.';};
 $('import').onclick=()=>$('backupFile').click();
 $('backupFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>20000)throw Error();const v=JSON.parse(await file.text());if(!validBackup(v))throw Error();if(!confirm('백업 파일의 점수와 답으로 현재 기록을 바꿀까요?'))return;saved.best=v.best;answers=v.answers.slice();document.querySelectorAll('#questions input').forEach(input=>{input.checked=answers[Number(input.name.slice(1))]===Number(input.value);});$('result').hidden=true;persist();showTab('quiz');$('backupStatus').textContent=storageOK?'학습 기록을 복원했습니다.':'기록을 불러왔지만 브라우저 저장이 차단되어 이 창에서만 유지됩니다.';}catch(err){$('backupStatus').textContent='복원할 수 없습니다. 이 앱에서 내려받은 학습 기록 JSON 파일인지 확인하세요.';}finally{e.target.value='';}};
+
+function isValidStudentId(value){return /^1[0-9]{4}$/.test(value);}
+function enterStudent(value){
+ if(!isValidStudentId(value)){ $('studentError').textContent='1로 시작하는 숫자 5자리를 입력해 주세요. 예: 10101';$('studentId').setAttribute('aria-invalid','true');$('studentId').focus();return false; }
+ studentId=value;key='malgyeol-progress-v1:student:'+studentId;saved={best:0,answers:[]};storageOK=true;
+ try{const v=JSON.parse(localStorage.getItem(key));if(v&&Number.isInteger(v.best)&&v.best>=0&&v.best<=100&&v.best%10===0){saved={best:v.best,answers:Array.isArray(v.answers)?v.answers:[]};}}catch(e){storageOK=false;}
+ answers=items.map((q,i)=>Number.isInteger(saved.answers[i])&&saved.answers[i]>=0&&saved.answers[i]<4?saved.answers[i]:null);
+ document.querySelectorAll('#questions input').forEach(input=>{input.checked=answers[Number(input.name.slice(1))]===Number(input.value);});
+ document.querySelectorAll('#questions details').forEach(detail=>{detail.open=false;});
+ $('studentError').textContent='';$('studentId').setAttribute('aria-invalid','false');$('currentStudent').textContent=studentId+' 학번의 학습실';$('result').hidden=true;$('backupStatus').textContent='';$('review').innerHTML='';showTab('quiz');status();$('studentGate').hidden=true;$('learningApp').hidden=false;$('quizTab').focus();return true;
+}
+$('studentForm').addEventListener('submit',event=>{event.preventDefault();enterStudent($('studentId').value);});
+$('changeStudent').onclick=()=>{persist();studentId=null;key=null;saved={best:0,answers:[]};answers=items.map(()=>null);$('learningApp').hidden=true;$('studentGate').hidden=false;$('studentId').value='';$('studentError').textContent='';$('studentId').setAttribute('aria-invalid','false');$('studentId').focus();};

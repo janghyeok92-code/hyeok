@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>공통국어1 - 상황에 맞게 표현하기 (높임·시간 표현)</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #eff6ff;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e3a8a, #2563eb);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    }
+
+    header .badge {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.92rem;
+      opacity: 0.9;
+    }
+
+    .student-bar {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .student-chip {
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .change-btn {
+      background: white;
+      color: var(--primary-dark);
+      border: none;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    /* 학번 및 이름 입력 게이트 */
+    .gate-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      max-width: 440px;
+      margin: 40px auto;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .gate-card h2 {
+      font-size: 1.3rem;
+      margin-bottom: 8px;
+    }
+
+    .gate-card p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      display: none;
+      font-weight: 600;
+    }
+
+    /* 탭 내비게이션 */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      background: var(--card);
+      font-size: 0.98rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+
+    .tab-btn.locked {
+      background: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    /* 상태 배너 */
+    .status-banner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .score-box {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .score-highlight {
+      color: var(--primary);
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    /* 문제 카드 */
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    }
+
+    .q-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .q-tag {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .q-status {
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .q-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .q-example {
+      background: #f8fafc;
+      border-left: 4px solid var(--primary);
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.94rem;
+      margin-bottom: 14px;
+      color: #1e293b;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .opt-btn {
+      text-align: left;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: white;
+      font-size: 0.94rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .opt-btn.correct {
+      border-color: var(--success);
+      background: var(--success-light);
+      color: #14532d;
+      font-weight: 700;
+    }
+
+    .opt-btn.wrong {
+      border-color: var(--danger);
+      background: var(--danger-light);
+      color: #7f1d1d;
+    }
+
+    /* 힌트 및 해설 영역 */
+    .feedback-box {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .feedback-box.hint {
+      display: block;
+      background: var(--warning-light);
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .feedback-box.pass {
+      display: block;
+      background: var(--success-light);
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .action-area {
+      text-align: center;
+      margin-top: 24px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+      transition: background 0.2s;
+      width: 100%;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .sync-status {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary-dark);
+    }
+
+    /* 탭 2: 복습 노트 스타일 */
+    .note-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .note-section h2 {
+      font-size: 1.25rem;
+      color: var(--primary-dark);
+      border-bottom: 2px solid var(--primary-light);
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+
+    .note-section h3 {
+      font-size: 1.05rem;
+      margin: 16px 0 8px;
+      color: #1e293b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-weight: 700;
+    }
+
+    .tip-card {
+      background: #f8fafc;
+      border-left: 4px solid var(--warning);
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-size: 0.92rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="badge">공통국어1 · 3. 올바른 언어생활 (2) 상황에 맞게 표현하기</div>
+    <h1>높임 표현과 시간 표현 스스로 탐구하기</h1>
+    <p>퀴즈에서 90점 이상 달성하면 핵심 개념 정리 노트가 열립니다!</p>
+    <div class="student-bar" id="student-bar">
+      <span class="student-chip" id="student-info-display"></span>
+      <button class="change-btn" onclick="resetStudent()">학번/이름 변경</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- 0. 학번 및 이름 입력 게이트 -->
+    <div id="student-gate" class="gate-card">
+      <h2>학생 정보 입력</h2>
+      <p>학습 기록과 선생님 스프레드시트 연동을 위해<br><strong>1로 시작하는 5자리 학번</strong>과 <strong>이름</strong>을 입력하세요.</p>
+      
+      <div class="input-group">
+        <label for="input-id">학번 (1학년 5자리 숫자, 예: 11201)</label>
+        <input type="text" id="input-id" maxlength="5" inputmode="numeric" placeholder="예: 11201" />
+      </div>
+
+      <div class="input-group">
+        <label for="input-name">이름</label>
+        <input type="text" id="input-name" placeholder="예: 김숭덕" />
+      </div>
+
+      <div id="gate-error" class="error-msg">1로 시작하는 5자리 학번과 이름을 정확히 입력해 주세요.</div>
+      <button class="btn-primary" onclick="startLearning()">학습 시작하기</button>
+    </div>
+
+    <!-- 메인 학습 앱 -->
+    <div id="main-app" class="hidden">
+      <div class="tabs">
+        <button id="tab-btn-1" class="tab-btn active" onclick="switchTab(1)">
+          📝 탭 1. 개념 탐구 퀴즈
+        </button>
+        <button id="tab-btn-2" class="tab-btn locked" onclick="switchTab(2)">
+          🔒 탭 2. 핵심 개념 정리 노트
+        </button>
+      </div>
+
+      <!-- 탭 1: 퀴즈 -->
+      <div id="tab-1">
+        <div class="status-banner">
+          <div class="score-box">
+            현재 점수: <span id="current-score" class="score-highlight">0</span>점 / 100점
+            <span id="best-score-text" style="color: var(--muted); font-size: 0.85rem; margin-left: 6px;"></span>
+          </div>
+          <div style="font-size: 0.88rem; color: var(--muted);">
+            ※ 오답 시 <strong>탐구 힌트</strong>가 열립니다. 스스로 다시 풀어보세요!
+          </div>
+        </div>
+
+        <div id="quiz-container"></div>
+
+        <div class="action-area">
+          <button class="btn-primary" onclick="submitAndSync()">최종 결과 제출 및 선생님 시트로 전송하기</button>
+          <div id="sync-status" class="sync-status"></div>
+        </div>
+      </div>
+
+      <!-- 탭 2: 시각화된 복습 자료 (90점 이상 잠금 해제) -->
+      <div id="tab-2" class="hidden">
+        <div class="note-section">
+          <h2>1. 높임 표현 한눈에 정리하기</h2>
+          <p>화자가 어떤 대상에 대하여 높이거나 낮추는 태도를 문법적으로 실현하는 표현입니다.</p>
+          <table>
+            <thead>
+              <tr>
+                <th>종류</th>
+                <th>높임의 대상</th>
+                <th>주요 실현 방법</th>
+                <th>예시</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>주체 높임법</strong></td>
+                <td>서술어의 주체(주어)</td>
+                <td>선어말 어미 <strong>-(으)시-</strong>, 주격 조사 <strong>께서</strong>, 특수 어휘(계시다, 주무시다 등)</td>
+                <td>할머니<strong>께서</strong> 방에서 주무<strong>신</strong>다.</td>
+              </tr>
+              <tr>
+                <td><strong>객체 높임법</strong></td>
+                <td>서술어의 객체(목적어·부사어)</td>
+                <td>특수 어휘(<strong>모시다, 드리다, 여쭙다, 뵙다</strong>), 부사격 조사 <strong>께</strong></td>
+                <td>동생이 할아버지<strong>께</strong> 선물을 <strong>드렸다</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>상대 높임법</strong></td>
+                <td>청자(듣는 이)</td>
+                <td>종결 어미 (격식체 4등급 / 비격식체 2등급)</td>
+                <td>선생님, 지금 <strong>가십시오</strong> / <strong>가요</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="tip-card">
+            <strong>💡 시험에 꼭 나오는 핵심 포인트!</strong><br>
+            • <strong>간접 높임:</strong> 높여야 할 대상의 신체 부분, 소유물, 생각 등을 높일 때는 특수 어휘 대신 <strong>'-(으)시-'</strong>만 사용합니다. (예: 교장 선생님의 말씀이 <strong>계시겠습니다(X) → 있으시겠습니다(O)</strong>)<br>
+            • <strong>과잉 공대(사물 존대):</strong> 높임의 대상이 아닌 사물을 높이는 잘못된 표현입니다. (예: 주문하신 커피 <strong>나오셨습니다(X) → 나왔습니다(O)</strong>)
+          </div>
+        </div>
+
+        <div class="note-section">
+          <h2>2. 시간 표현 한눈에 정리하기</h2>
+          <h3>① 시제 (발화시와 사건시의 관계)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>구분</th>
+                <th>시간 관계</th>
+                <th>선어말 어미</th>
+                <th>관형사형 어미</th>
+                <th>시간 부사어</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>과거 시제</strong></td>
+                <td>사건시 &lt; 발화시</td>
+                <td>-았-/-었-, -았었-/-었었-, -더-</td>
+                <td>-(으)ㄴ (동사), -던</td>
+                <td>어제, 아까, 옛날에</td>
+              </tr>
+              <tr>
+                <td><strong>현재 시제</strong></td>
+                <td>사건시 = 발화시</td>
+                <td>-는-/-ㄴ- (동사), ∅ (형용사·서술격조사)</td>
+                <td>-는 (동사), -(으)ㄴ (형용사)</td>
+                <td>지금, 현재, 오늘</td>
+              </tr>
+              <tr>
+                <td><strong>미래 시제</strong></td>
+                <td>발화시 &lt; 사건시</td>
+                <td>-겠-, -(으)리-</td>
+                <td>-(으)ㄹ</td>
+                <td>내일, 모레, 곧</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>② 동작상 (발화시를 기준으로 동작의 양상 표현)</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>종류</th>
+                <th>의미</th>
+                <th>실현 방법 및 예시</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>진행상</strong></td>
+                <td>동작이 계속 이어지고 있음</td>
+                <td><strong>-고 있다, -아/-어 가다</strong> (예: 민수가 밥을 먹<strong>고 있다</strong>.)</td>
+              </tr>
+              <tr>
+                <td><strong>완료상</strong></td>
+                <td>동작이 이미 끝났거나 그 결과가 지속됨</td>
+                <td><strong>-아/-어 있다, -아/-어 버리다</strong> (예: 의자에 앉<strong>아 있다</strong>, 다 먹<strong>어 버렸다</strong>.)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvUFg-A08qaLsXWX2VlWlItinHJGU2PPsb9nY88OXYvFT2jhiTXsF3i0C1fsHcn2bYBA/exec";
+
+    const quizData = [
+      {
+        category: "높임 표현 · 주체/객체 높임",
+        question: "다음 문장에서 실현된 높임법과 그 실현 방법을 바르게 분석한 것은?",
+        example: "“어머니께서 할머니를 모시고 병원에 가셨다.”",
+        options: [
+          "‘모시고’를 통해 주체인 ‘어머니’를 높이고 있다.",
+          "‘께서’와 ‘-시-’를 통해 객체인 ‘할머니’를 높이고 있다.",
+          "‘모시고’는 객체 높임 특수 어휘이며, ‘가셨다’의 ‘-시-’는 주체 높임 선어말 어미이다.",
+          "상대 높임법 중 격식체인 ‘해라체’가 사용되어 청자를 높이고 있다."
+        ],
+        answer: 2,
+        hint: "‘모시다’는 누구를 모시는지(목적어 ‘할머니’)를 높이는 특수 어휘이고, 병원에 가는 주체는 ‘어머니’입니다."
+      },
+      {
+        category: "높임 표현 · 간접 높임",
+        question: "다음 중 높임 표현이 문법적으로 가장 적절하게 쓰인 문장은?",
+        example: "상황: 학생들에게 교장 선생님의 훈화 말씀을 안내할 때",
+        options: [
+          "지금부터 교장 선생님의 말씀이 계시겠습니다.",
+          "지금부터 교장 선생님의 말씀이 있으시겠습니다.",
+          "지금부터 교장 선생님께서 말씀이 계시겠습니다.",
+          "지금부터 교장 선생님의 말씀을 여쭙겠습니다."
+        ],
+        answer: 1,
+        hint: "‘말씀’은 교장 선생님과 관련된 대상(간접 높임)이므로 특수 어휘 ‘계시다’가 아니라 ‘있다’에 ‘-(으)시-’를 결합해야 합니다."
+      },
+      {
+        category: "높임 표현 · 과잉 공대",
+        question: "다음 대화에서 어색한 높임 표현을 찾아 바르게 고친 것으로 적절한 것은?",
+        example: "점원: “손님, 주문하신 아메리카노 한 잔 나오셨습니다. 결제는 이쪽에서 하실게요.”",
+        options: [
+          "‘주문하신’은 사물을 높인 것이므로 ‘주문한’으로 고친다.",
+          "‘나오셨습니다’는 커피를 높인 과잉 공대이므로 ‘나왔습니다’로 고친다.",
+          "‘하실게요’는 주체 높임이 빠졌으므로 ‘하시겠으실게요’로 고친다.",
+          "어색한 부분이 없으므로 그대로 사용한다."
+        ],
+        answer: 1,
+        hint: "‘나오다’의 주어는 손님이 아니라 ‘아메리카노(사물)’입니다. 사물에는 선어말 어미 ‘-시-’를 쓰지 않습니다."
+      },
+      {
+        category: "높임 표현 · 객체 높임",
+        question: "다음 중 객체 높임법이 사용되지 않은 문장은?",
+        example: "객체 높임은 서술어의 목적어나 부사어가 지시하는 대상을 높이는 방법이다.",
+        options: [
+          "나는 선생님께 질문을 여쭈었다.",
+          "형은 할아버지를 뵈러 시골에 내려갔다.",
+          "아버지께서 퇴근 후 거실에서 신문을 읽으신다.",
+          "동생이 어버이날을 맞아 부모님께 편지를 드렸다."
+        ],
+        answer: 2,
+        hint: "선지 ①(여쭈다), ②(뵙다), ④(드리다)는 모두 객체 높임 특수 어휘를 사용했습니다. 주체만 높인 문장을 찾아보세요."
+      },
+      {
+        category: "높임 표현 · 상대 높
